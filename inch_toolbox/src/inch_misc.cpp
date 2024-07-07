@@ -111,6 +111,7 @@ double InchMisc::debugger_saturation(double input_data_)
 double InchMisc::tanh_function(double input_data, double cut_off_force)
 {
   double data = input_data / cut_off_force * 4;
+<<<<<<< HEAD
   return abs((exp(data) - exp(-data)) / (exp(data) + exp(-data)));
 }
 
@@ -143,3 +144,7 @@ void InchMisc::init_MPC_controller(double w0_, double zeta_, double cut_off_freq
   if(cut_off_freq_ != 0) init_butterworth_2nd_filter(cut_off_freq_);
 }
 
+=======
+  return input_data * abs((exp(data) - exp(-data)) / (exp(data) + exp(-data)));
+}
+>>>>>>> ecf1589b5c9db856482fd14700e97459b22f802e
