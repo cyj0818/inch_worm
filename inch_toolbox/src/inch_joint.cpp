@@ -13,6 +13,12 @@ InchJoint::InchJoint()
   Link1_mass = priv_nh_.param<double>("Link1_mass", 0);
   Link2_mass = priv_nh_.param<double>("Link2_mass", 0);
 
+  Gravity = priv_nh_.param<double>("Gravity", 0);
+
+  N1 = priv_nh_.param<double>("N1", 0);
+  N2 = priv_nh_.param<double>("N2", 0);
+  N3 = priv_nh_.param<double>("N3", 0);
+
 
   initPublisher();
   initSubscriber();
@@ -98,16 +104,18 @@ Eigen::Matrix2d InchJoint::M_Matrix()
 {
   Eigen::Matrix2d M_matrix;
 
-
+  M_matrix << N1 + N2 + 2*N3*cos(q_meas[1]), N2 + N3*cos(q_meas[1]),
+                     N2 + N3*cos(q_meas[1]),                     N2; 
 
   return M_matrix;
 }
 
-Eigen::Matrix2d InchJoint::C_Matrix()
+Eigen::Vector2d InchJoint::C_Matrix()
 {
-  Eigen::Matrix2d C_matrix;
+  Eigen::Vector2d C_matrix;
 
-
+  C_matrix << -N3*sin(q_meas[1])*(2*q_dot_meas[0]*q_dot_meas[1] + pow(q_dot_meas[1], 2)),
+                                                   N3*pow(q_dot_meas[0], 2)*sin(q_meas[1]);
 
   return C_matrix;
 }
@@ -116,7 +124,8 @@ Eigen::Vector2d InchJoint::G_Matrix()
 {
   Eigen::Vector2d G_matrix;
 
-
+  G_matrix << Link1_mass * Gravity * Link1_COM * cos(q_meas[0]) + Link2_mass * Gravity * Link1_length * cos(q_meas[0]) + Link2_mass * Gravity * Link2_COM * cos(q_meas[0] + q_meas[1]),
+              Link2_mass * Gravity * Link2_COM * cos(q_meas[0] + q_meas[1]); 
 
   return G_matrix;
 }
@@ -125,13 +134,13 @@ Eigen::Vector2d InchJoint::calc_MCGDynamics()
 {
   Eigen::Vector2d tau_MCG;
   Eigen::Matrix2d M;
-  Eigen::Matrix2d C;
+  Eigen::Vector2d C;
   Eigen::Vector2d G;
   M = M_Matrix();
   C = C_Matrix();
   G = G_Matrix();
 
-  tau_MCG = M * q_ddot_meas + C * q_dot_meas + G;
+  tau_MCG = M * q_ddot_meas + C + G;
 
   return tau_MCG;
 }
@@ -141,3 +150,5 @@ void InchJoint::test()
 {
   ROS_INFO("Here is Inch Joint Toolbox!");
 }
+
+

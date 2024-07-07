@@ -113,3 +113,33 @@ double InchMisc::tanh_function(double input_data, double cut_off_force)
   double data = input_data / cut_off_force * 4;
   return abs((exp(data) - exp(-data)) / (exp(data) + exp(-data)));
 }
+
+
+
+
+/*****************************************************************************
+** MPC
+*****************************************************************************/
+double InchMisc::MPC_controller(double ref_, double meas_, double time_loop_)
+{
+  double input_error_ = ref_ - meas_;
+  double error_dot = NumDiff(meas_, time_loop_);
+  
+  error_sum = error_sum + input_error_;
+
+  error_sum = debugger_saturation(error_sum);
+
+  return Kp * input_error_ + Ki * error_sum + Kd * error_dot;
+}
+
+void InchMisc::init_MPC_controller(double w0_, double zeta_, double cut_off_freq_)
+{
+  w0 = w0_;
+  zeta = zeta_;
+  error_i = 0;
+  error_sum = 0;
+  cut_off_freq = cut_off_freq_;
+
+  if(cut_off_freq_ != 0) init_butterworth_2nd_filter(cut_off_freq_);
+}
+

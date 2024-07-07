@@ -52,18 +52,6 @@ class InchJoint : public inch::InchMisc
   Eigen::Vector2d phi_dot_meas;
 
 
-  // From Launch File
-  //Link Param
-  double length_1;
-  double length_2;
-  double length_3;
-  double com_1;
-  double com_2;
-  double mass_1;
-  double mass_2;
-  double g;
-  std::string robot_name_;
-
  private:
   /*****************************************************************************
   ** ROS NodeHandle
@@ -95,7 +83,7 @@ class InchJoint : public inch::InchMisc
   void encoder_phi_callback(const std_msgs::Float64MultiArray::ConstPtr &msg);
   void calc_angle_timer_callback(const ros::TimerEvent&);
   Eigen::Matrix2d M_Matrix();
-  Eigen::Matrix2d C_Matrix();
+  Eigen::Vector2d C_Matrix();
   Eigen::Vector2d G_Matrix();
   Eigen::Vector2d calc_MCGDynamics();
   
@@ -112,6 +100,12 @@ class InchJoint : public inch::InchMisc
   
   double Link1_mass;
   double Link2_mass;
+
+  double Gravity;
+
+  double N1;  // N1 = m1*c1^2 + I1 + m2*l1^2
+  double N2;  // N2 = m2*c2^2 + I2 
+  double N3;  // N3 = m2*l1*c2 
 };
 
 #endif /*INCH_JOINT_H_*/

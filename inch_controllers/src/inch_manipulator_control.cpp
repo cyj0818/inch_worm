@@ -228,7 +228,6 @@ void InchControl::Experiment_0623_1Link()
 void InchControl::YujinInit()
 {
 
-
 }
 
 void InchControl::YujinWhile()
